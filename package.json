@@ -1,0 +1,31 @@
+{
+  "name": "naver-webtoon-helper",
+  "version": "1.0.0",
+  "dependencies": {
+    "async-lock": "^1.3.0",
+    "date-fns": "^2.22.1",
+    "date-fns-tz": "^1.1.4"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/async-lock": "^1.1.2",
+    "@types/webpack": "^5.28.0",
+    "@types/copy-webpack-plugin": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "copy-webpack-plugin": "^9.0.0",
+    "eslint": "^7.29.0",
+    "eslint-plugin-import": "^2.23.4",
+    "prettier": "^2.3.1",
+    "ts-loader": "^9.2.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.4",
+    "web-ext": "^6.2.0",
+    "web-ext-types": "^3.2.1",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.7.2"
+  },
+  "prettier": {
+    "printWidth": 120
+  }
+}
