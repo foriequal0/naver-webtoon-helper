@@ -5,7 +5,7 @@ export type Detail = {
   tier: Tier;
   titleId: number;
   no: number;
-}
+};
 
 export function parseDetail(href: string): Detail {
   const url = new URL(href);
@@ -15,9 +15,8 @@ export function parseDetail(href: string): Detail {
   const noStr = url.searchParams.get("no")!;
   const no = parseInt(noStr);
 
-  return { url, tier, titleId, no, }
+  return { url, tier, titleId, no };
 }
-
 
 export type List = {
   url: URL;
