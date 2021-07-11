@@ -1,7 +1,7 @@
 import { browser } from "webextension-polyfill-ts";
 
 import { Tier } from "../Tier";
-import { Message, MessageArgs, MessageResponse, MessageType } from "./main";
+import { MessageArgs, MessageResponse, MessageType } from "./main";
 
 export type SetReadArgs = {
   tier: Tier;
