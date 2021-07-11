@@ -27,7 +27,7 @@
       "js": ["list.js"]
     },
     {
-      "matches": ["https://comic.naver.com/webtoon/weekday"],
+      "matches": ["https://comic.naver.com/webtoon/weekday", "https://comic.naver.com/webtoon/weekday?*"],
       "js": ["weekday.js"]
     },
     {
