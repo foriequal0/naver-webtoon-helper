@@ -14,7 +14,7 @@ async function main() {
   await syncRecentViews();
   const list = parseList(window.location.href);
   const rows = getRows();
-  const mostRecent = rows[rows.length - 1];
+  const mostRecent = rows[0];
   const state = await getTitleState(list.tier, list.titleId);
   if (autoJumpMostRecent(state, mostRecent)) {
     return;
