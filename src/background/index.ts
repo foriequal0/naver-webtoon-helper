@@ -1,3 +1,5 @@
+import { browser } from "webextension-polyfill-ts";
+
 import { Tier } from "../Tier";
 import { Message, MessageArgs, MessageResponse, MessageType } from "./main";
 
@@ -26,5 +28,5 @@ export async function request<Type extends MessageType>(
   type: Type,
   args: MessageArgs<Type>
 ): Promise<MessageResponse<Type>> {
-  return await browser.runtime.sendMessage<Message<Type>, MessageResponse<Type>>({ type, args });
+  return await browser.runtime.sendMessage({ type, args });
 }

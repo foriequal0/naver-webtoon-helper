@@ -1,9 +1,12 @@
 import AsyncLock from "async-lock";
+import { browser, Runtime } from "webextension-polyfill-ts";
 
 import { updateTitleState } from "../TitleState";
 import { InmemoryState } from "./inmemoryState";
 
 import { PrepareSync, SetReadArgs, SyncArgs, ToggleMuteTitleArgs } from "./index";
+
+import MessageSender = Runtime.MessageSender;
 
 const lock = new AsyncLock();
 const inMemoryState = new InmemoryState();
@@ -39,7 +42,7 @@ export type MessageResponse<Type extends MessageType> = Unpromisify<ReturnType<t
 
 type Unpromisify<T> = T extends Promise<infer R> ? R : T;
 
-async function handleMessage(message: unknown, _sender: browser.runtime.MessageSender): Promise<unknown> {
+async function handleMessage(message: unknown, _sender: MessageSender): Promise<unknown> {
   const { type, args } = message as Message<MessageType>;
   const handler = handlers[type];
   // @ts-ignore TS2345

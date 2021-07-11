@@ -1,4 +1,5 @@
 import AsyncLock from "async-lock";
+import { browser } from "webextension-polyfill-ts";
 
 import { Tier } from "./Tier";
 
@@ -147,7 +148,7 @@ function getTitleStateKey(tier: Tier, titleId: number): string {
 export async function getTitleState(tier: Tier, titleId: number): Promise<TitleState> {
   const stateKey = getTitleStateKey(tier, titleId);
   try {
-    const result = await browser.storage.local.get<Record<string, TitleJSON>>(stateKey);
+    const result = await browser.storage.local.get(stateKey);
     return TitleState.fromJSON(result[stateKey]);
   } catch (e) {
     return new TitleState(titleId, false, {});
@@ -165,7 +166,7 @@ export async function getTitleStates(tier: Tier, ...titleIds: number[]): Promise
     };
     query[key] = defaultValue;
   }
-  const result = await browser.storage.local.get<Record<string, TitleJSON>>(query);
+  const result = await browser.storage.local.get(query);
   return Object.values(result).map(TitleState.fromJSON);
 }
 
