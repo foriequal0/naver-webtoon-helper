@@ -1,11 +1,11 @@
 import { request } from "./background";
 
 export async function syncRecentViews(): Promise<void> {
-  const debounced = await request("prepare-sync", {
+  const debounced = await request("debounce-sync", {
     debounce: 300,
   });
 
-  if (!debounced) {
+  if (debounced) {
     return;
   }
 

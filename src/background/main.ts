@@ -27,8 +27,8 @@ const handlers = {
       state.mute = true;
     });
   },
-  "prepare-sync": (args: PrepareSync) => {
-    return inMemoryState.prepareSync(args.debounce);
+  "debounce-sync": (args: PrepareSync) => {
+    return inMemoryState.debounceSync(args.debounce);
   },
 };
 
