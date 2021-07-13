@@ -34,7 +34,7 @@ function getRows(): DetailRow[] {
   for (const title of document.querySelectorAll<HTMLElement>(".title")) {
     const element = title.closest("tr")!;
     const detail = parseDetail(element.querySelector("a")!.href);
-    const up = document.querySelector("img[alt='UP']") !== undefined;
+    const up = element.querySelector("img[alt='UP']") !== null;
     result.push({ ...detail, up });
   }
   return result;
