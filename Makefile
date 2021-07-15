@@ -7,6 +7,10 @@ lint: eslint prettier webext-lint
 .PHONY: fix
 fix: fix-eslint fix-prettier
 
+.PHONY: sign
+sign: webext-build
+	$$(npm bin)/web-ext sign --artifacts-dir artifacts/ --source-dir dist/
+
 
 .PHONY: webpack-build
 webpack-build: npm

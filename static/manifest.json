@@ -35,5 +35,10 @@
       "js": ["weekdayList.js"]
     }
   ],
-  "permissions": ["https://m.comic.naver.com/api/recentlyview/get.nhn", "webRequest", "cookies", "storage"]
+  "permissions": ["https://m.comic.naver.com/api/recentlyview/get.nhn", "webRequest", "cookies", "storage"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{8f4e36bf-0d47-4fdf-ab3e-3de2c40a95c8}"
+    }
+  }
 }
