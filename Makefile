@@ -16,6 +16,11 @@ webpack-build: npm
 webext-build: npm webpack-build
 	$$(npm bin)/web-ext build --overwrite-dest --artifacts-dir artifacts/ --source-dir dist/
 
+.PHONY: archive
+archive:
+	mkdir artifacts/
+	git archive --format=tar.gz --prefix=naver-webtoon-helper/ -o artifacts/naver-webtoon-helper.src.tar.gz HEAD
+
 .PHONY: webext-lint
 webext-lint: npm build
 	$$(npm bin)/web-ext lint --source-dir dist

@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16
-      - run: make build
+      - run: make archive build
       - uses: actions/upload-artifact@v1
         with:
           name: artifacts
