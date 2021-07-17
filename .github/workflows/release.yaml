@@ -23,6 +23,6 @@ jobs:
           files: |
             artifacts/*.zip
             artifacts/*.xpi
-            artifacts/*.src.zip
+            artifacts/*.src.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
