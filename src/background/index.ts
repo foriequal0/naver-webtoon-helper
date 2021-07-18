@@ -15,9 +15,10 @@ export type SyncArgs = {
   no: number;
 };
 
-export type ToggleMuteTitleArgs = {
+export type SetMuteArgs = {
   tier: Tier;
   titleId: number;
+  mute: boolean;
 };
 
 export type PrepareSync = {

@@ -2,6 +2,7 @@ import { getDay } from "date-fns";
 import utcToZonedTime from "date-fns-tz/utcToZonedTime";
 import addHours from "date-fns/addHours";
 
+import { addMute } from "../mute";
 import { syncRecentViews } from "../syncRecentViews";
 import { getTitleState, TitleState } from "../TitleState";
 import { Detail, parseDetail, parseList } from "../url";
@@ -16,14 +17,17 @@ async function main() {
   const rows = getRows();
   const mostRecent = rows[0];
   const state = await getTitleState(list.tier, list.titleId);
-  if (autoJumpMostRecent(state, mostRecent)) {
-    return;
-  }
+  addMute(state);
 
   updateThumbnailLink(state, mostRecent);
   fadeRead(state);
-  if (list.weekday) {
-    refreshUntilUpdate(state, list.weekday, mostRecent);
+  if (!state.mute) {
+    if (autoJumpMostRecent(state, mostRecent)) {
+      return;
+    }
+    if (list.weekday) {
+      refreshUntilUpdate(state, list.weekday, mostRecent);
+    }
   }
 }
 

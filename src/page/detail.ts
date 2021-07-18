@@ -1,4 +1,5 @@
 import { request } from "../background";
+import { addMute } from "../mute";
 import { syncRecentViews } from "../syncRecentViews";
 import { Tier } from "../Tier";
 import { getTitleState } from "../TitleState";
@@ -17,6 +18,8 @@ async function main() {
     no: detail.no,
   });
   await fadeArticleNavigation(detail.tier, detail.titleId);
+  const state = await getTitleState(detail.tier, detail.titleId);
+  addMute(state);
 }
 
 async function fadeArticleNavigation(tier: Tier, titleId: number) {

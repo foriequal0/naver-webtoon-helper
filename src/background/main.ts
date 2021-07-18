@@ -4,7 +4,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import { updateTitleState } from "../TitleState";
 import { InmemoryState } from "./inmemoryState";
 
-import { PrepareSync, SetReadArgs, SyncArgs, ToggleMuteTitleArgs } from "./index";
+import { PrepareSync, SetMuteArgs, SetReadArgs, SyncArgs } from "./index";
 
 import MessageSender = Runtime.MessageSender;
 
@@ -22,9 +22,9 @@ const handlers = {
       return state.sync(args.no);
     });
   },
-  "toggle-mute-title": async (args: ToggleMuteTitleArgs) => {
+  "set-mute": async (args: SetMuteArgs) => {
     await updateTitleState(lock, args.tier, args.titleId, (state) => {
-      state.mute = true;
+      state.mute = args.mute;
     });
   },
   "debounce-sync": (args: PrepareSync) => {
