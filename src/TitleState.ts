@@ -4,6 +4,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Tier } from "./Tier";
 
 export class TitleState {
+  public readonly tier: Tier;
   public readonly titleId: number;
   public mute: boolean;
   public readonly articles: Record<number, ArticleState>;
@@ -11,7 +12,8 @@ export class TitleState {
     return Object.entries(this.articles).length;
   }
 
-  public constructor(titleId: number, mute: boolean, articles: Record<number, ArticleState>) {
+  public constructor(tier: Tier, titleId: number, mute: boolean, articles: Record<number, ArticleState>) {
+    this.tier = tier;
     this.titleId = titleId;
     this.mute = mute;
     this.articles = articles;
@@ -65,11 +67,12 @@ export class TitleState {
     const articles: Record<number, ArticleState> = Object.fromEntries(
       json.articles.map((article) => [article.no, ArticleState.fromJSON(article)])
     );
-    return new TitleState(json.titleId, json.mute, articles);
+    return new TitleState(json.tier, json.titleId, json.mute, articles);
   }
 
   public toJSON(): TitleJSON {
     return {
+      tier: this.tier,
       titleId: this.titleId,
       mute: this.mute,
       articles: Object.values(this.articles).map((article) => article.toJSON()),
@@ -130,6 +133,7 @@ export class ArticleState {
 }
 
 type TitleJSON = {
+  tier: Tier;
   titleId: number;
   mute: boolean;
   articles: ArticleJSON[];
@@ -149,9 +153,12 @@ export async function getTitleState(tier: Tier, titleId: number): Promise<TitleS
   const stateKey = getTitleStateKey(tier, titleId);
   try {
     const result = await browser.storage.local.get(stateKey);
-    return TitleState.fromJSON(result[stateKey]);
+    return TitleState.fromJSON({
+      tier,
+      ...result[stateKey],
+    });
   } catch (e) {
-    return new TitleState(titleId, false, {});
+    return new TitleState(tier, titleId, false, {});
   }
 }
 
@@ -160,6 +167,7 @@ export async function getTitleStates(tier: Tier, ...titleIds: number[]): Promise
   for (const titleId of titleIds) {
     const key = getTitleStateKey(tier, titleId);
     const defaultValue = {
+      tier,
       titleId,
       mute: false,
       articles: [],
