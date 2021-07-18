@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      .label_wrapper {
+        display: grid;
+        grid-template-columns: max-content max-content;
+        grid-gap: 5px;
+      }
+      .label_wrapper label {
+        text-align: right;
+      }
+      .label_wrapper label:after {
+        content: ":";
+      }
+    </style>
+  </head>
+  <body>
+    <div class="label_wrapper">
+      <label for="import">Import from JSON</label>
+      <div>
+        <input type="file" id="import" name="import" accept=".json, application/json" />
+        <div>주의: 기존 설정이 날아갑니다.</div>
+      </div>
+
+      <label for="export">Export to JSON</label>
+      <input id="export" type="button" value="Export" />
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

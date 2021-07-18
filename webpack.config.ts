@@ -9,6 +9,7 @@ export default <webpack.Configuration>{
     list: "./src/page/list.ts",
     weekday: "./src/page/weekday.ts",
     weekdayList: "./src/page/weekdayList.ts",
+    options: "./src/page/options.ts",
     background: "./src/background/main.ts",
   },
   output: {
