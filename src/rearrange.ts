@@ -49,7 +49,9 @@ async function group(tier: Tier, thumbs: Thumbnail[]): Promise<SortResult> {
     };
 
     // TODO : 휴재하면 내리고 재개하면 위로 올리기
-    if (readIn(3)) {
+    if (state.mute) {
+      inactives.push(thumb);
+    } else if (readIn(3)) {
       // 3주 이내에 본 적 있음
       actives.push(thumb);
     } else if (thumb.fresh) {
