@@ -1,14 +1,10 @@
 import { exportStates, importStates } from "../TitleState";
 
 const inputImport = document.getElementById("import") as HTMLInputElement;
-inputImport.addEventListener("change", (fileEvent) => {
+inputImport.addEventListener("change", async (fileEvent) => {
   const file = (fileEvent.target as HTMLInputElement).files![0];
-  const reader = new FileReader();
-  reader.onload = async (readEvent) => {
-    const count = await importStates(readEvent.target!.result as string);
-    alert(`${count} 개 작품 불러오기 성공`);
-  };
-  reader.readAsText(file);
+  const count = await importStates(await file.text());
+  alert(`${count} 개 작품 불러오기 성공`);
 });
 
 const inputExport = document.getElementById("export") as HTMLInputElement;
