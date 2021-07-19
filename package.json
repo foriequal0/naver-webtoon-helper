@@ -1,6 +1,9 @@
 {
   "name": "naver-webtoon-helper",
   "version": "1.0.0",
+  "scripts": {
+    "build": "webpack && web-ext build --overwrite-dest --artifacts-dir artifacts/ --source-dir dist/"
+  },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
     "@types/async-lock": "^1.1.2",
