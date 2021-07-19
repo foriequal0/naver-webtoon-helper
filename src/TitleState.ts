@@ -198,3 +198,29 @@ export async function updateTitleState<T>(
     return result;
   });
 }
+
+export async function exportStates(): Promise<string> {
+  const state = await browser.storage.local.get();
+  const result: Record<string, unknown>[] = [];
+  for (const [key, value] of Object.entries(state)) {
+    if (key.startsWith("title:")) {
+      result.push(value);
+    }
+  }
+  return JSON.stringify(result, null, 2);
+}
+
+export async function importStates(json: string): Promise<number> {
+  const parsed = JSON.parse(json);
+  const result: Record<string, unknown> = {};
+  let count = 0;
+  for (const item of parsed) {
+    const titleState = TitleState.fromJSON(item);
+    const key = getTitleStateKey(titleState.tier, titleState.titleId);
+    result[key] = titleState.toJSON();
+    count++;
+  }
+  await browser.storage.local.clear();
+  await browser.storage.local.set(result);
+  return count;
+}

@@ -35,6 +35,9 @@
       "js": ["weekdayList.js"]
     }
   ],
+  "options_ui": {
+    "page": "options.html"
+  },
   "permissions": ["https://m.comic.naver.com/api/recentlyview/get.nhn", "webRequest", "cookies", "storage"],
   "browser_specific_settings": {
     "gecko": {
