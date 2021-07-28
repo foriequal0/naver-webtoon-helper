@@ -92,7 +92,8 @@ export class ArticleState {
   }
 
   public static createRead(no: number): ArticleState {
-    return new ArticleState(no, new Date(), undefined);
+    const now = new Date();
+    return new ArticleState(no, now, now);
   }
 
   public static createSync(no: number): ArticleState {
