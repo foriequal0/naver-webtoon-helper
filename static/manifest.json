@@ -33,6 +33,10 @@
     {
       "matches": ["https://comic.naver.com/webtoon/weekdayList?*"],
       "js": ["weekdayList.js"]
+    },
+    {
+      "matches": ["https://m.comic.naver.com/*"],
+      "js": ["mobile.js"]
     }
   ],
   "options_ui": {
