@@ -35,7 +35,7 @@ type DetailRow = Detail & { up: boolean };
 
 function getRows(): DetailRow[] {
   const result: DetailRow[] = [];
-  for (const title of document.querySelectorAll<HTMLElement>(".title")) {
+  for (const title of document.querySelectorAll<HTMLTableCellElement>("td.title")) {
     const element = title.closest("tr")!;
     const detail = parseDetail(element.querySelector("a")!.href);
     const up = element.querySelector("img[alt='UP']") !== null;
@@ -63,7 +63,7 @@ function updateThumbnailLink(state: TitleState, mostRecent: DetailRow) {
 }
 
 function fadeRead(state: TitleState) {
-  for (const title of document.querySelectorAll<HTMLElement>(".title")) {
+  for (const title of document.querySelectorAll<HTMLTableCellElement>("td.title")) {
     const row = title.closest("tr")!;
     const detail = parseDetail(row.querySelector("a")!.href);
     if (state.articles[detail.no]) {
