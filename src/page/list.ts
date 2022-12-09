@@ -1,6 +1,6 @@
-import { getDay } from "date-fns";
 import utcToZonedTime from "date-fns-tz/utcToZonedTime";
 import addHours from "date-fns/addHours";
+import getDay from "date-fns/getDay";
 
 import { addMute } from "../mute";
 import { syncRecentViews } from "../syncRecentViews";
