@@ -2,7 +2,8 @@
   "name": "naver-webtoon-helper",
   "version": "1.0.0",
   "scripts": {
-    "build": "webpack && web-ext build --overwrite-dest --artifacts-dir artifacts/ --source-dir dist/"
+    "build": "webpack && web-ext build --overwrite-dest --artifacts-dir artifacts/ --source-dir dist/",
+    "test": "vitest test/"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
@@ -22,6 +23,7 @@
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.3",
+    "vitest": "^0.25.6",
     "web-ext": "^7.4.0",
     "web-ext-types": "^3.2.1",
     "webextension-polyfill-ts": "^0.26.0",
