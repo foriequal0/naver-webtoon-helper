@@ -3,8 +3,9 @@ import addHours from "date-fns/addHours";
 import getDay from "date-fns/getDay";
 
 import { addMute } from "../mute";
+import { TitleState } from "../states";
+import { getTitleState } from "../states/operations";
 import { syncRecentViews } from "../syncRecentViews";
-import { getTitleState, TitleState } from "../TitleState";
 import { Detail, parseDetail, parseList } from "../url";
 
 main().catch((e) => {

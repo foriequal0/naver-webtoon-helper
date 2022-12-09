@@ -1,8 +1,8 @@
 import { request } from "../background";
 import { addMute } from "../mute";
+import { getTitleState } from "../states/operations";
 import { syncRecentViews } from "../syncRecentViews";
 import { Tier } from "../Tier";
-import { getTitleState } from "../TitleState";
 import { parseDetail } from "../url";
 
 main().catch((e) => {

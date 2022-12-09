@@ -1,10 +1,9 @@
 import AsyncLock from "async-lock";
 import { browser, Runtime } from "webextension-polyfill-ts";
 
-import { updateTitleState } from "../TitleState";
+import { updateTitleState } from "../states/operations";
+import { PrepareSync, SetMuteArgs, SetReadArgs, SyncArgs } from "./";
 import { InmemoryState } from "./inmemoryState";
-
-import { PrepareSync, SetMuteArgs, SetReadArgs, SyncArgs } from "./index";
 
 import MessageSender = Runtime.MessageSender;
 

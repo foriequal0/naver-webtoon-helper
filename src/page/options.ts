@@ -1,4 +1,4 @@
-import { exportStates, importStates } from "../TitleState";
+import { exportStates, importStates } from "../states/operations";
 
 const inputImport = document.getElementById("import") as HTMLInputElement;
 inputImport.addEventListener("change", async (fileEvent) => {

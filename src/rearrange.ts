@@ -1,6 +1,7 @@
+import { TitleState } from "./states";
+import { getTitleStates } from "./states/operations";
 import { parseThumbnail, Thumbnail } from "./Thumbnail";
 import { Tier } from "./Tier";
-import { getTitleStates, TitleState } from "./TitleState";
 
 export async function rearrange(tier: Tier, thumbsContainer: HTMLElement): Promise<void> {
   const thumbs = [];
