@@ -11,15 +11,11 @@ export async function syncRecentViews(): Promise<void> {
 
   for await (const rv of fetchRecentViews()) {
     const tier = getTier(rv.webtoonLevelCode);
-    const newSync = await request("sync", {
+    await request("set-read", {
       tier,
       titleId: rv.titleId,
       no: rv.no,
     });
-
-    if (!newSync) {
-      break;
-    }
   }
 }
 

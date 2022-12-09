@@ -1,24 +1,19 @@
 import AsyncLock from "async-lock";
 import { browser, Runtime } from "webextension-polyfill-ts";
 
-import { updateTitleState } from "../states/operations";
-import { PrepareSync, SetMuteArgs, SetReadArgs, SyncArgs } from "./";
-import { InmemoryState } from "./inmemoryState";
+import { migrate } from "../migrations";
+import { updateMetaState, updateTitleState } from "../states/operations";
+import { PrepareSync, SetMuteArgs, SetReadArgs } from "./";
 
 import MessageSender = Runtime.MessageSender;
+import OnInstalledDetailsType = Runtime.OnInstalledDetailsType;
 
 const lock = new AsyncLock();
-const inMemoryState = new InmemoryState();
 
 const handlers = {
   "set-read": async (args: SetReadArgs) => {
     return await updateTitleState(lock, args.tier, args.titleId, (state) => {
       return state.setRead(args.no);
-    });
-  },
-  sync: async (args: SyncArgs) => {
-    return await updateTitleState(lock, args.tier, args.titleId, (state) => {
-      return state.sync(args.no);
     });
   },
   "set-mute": async (args: SetMuteArgs) => {
@@ -27,7 +22,9 @@ const handlers = {
     });
   },
   "debounce-sync": (args: PrepareSync) => {
-    return inMemoryState.debounceSync(args.debounce);
+    return updateMetaState(lock, (state) => {
+      return state.updateSyncAt(args.debounce);
+    });
   },
 };
 
@@ -49,3 +46,13 @@ async function handleMessage<T extends MessageType>(
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
+
+async function handleInstall(detail: OnInstalledDetailsType): Promise<void> {
+  if (detail.reason !== "update" || !detail.previousVersion) {
+    return;
+  }
+
+  await migrate(detail.previousVersion);
+}
+
+browser.runtime.onInstalled.addListener(handleInstall);

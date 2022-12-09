@@ -1,14 +1,14 @@
 import { Tier } from "../Tier";
 
+export type MetaJSON = {
+  version: string;
+  syncAt?: string;
+};
+
 export type TitleJSON = {
   tier: Tier;
   titleId: number;
-  mute: boolean;
-  articles: ArticleJSON[];
-};
-
-export type ArticleJSON = {
-  no: number;
+  mute?: boolean;
   readAt?: string;
-  syncAt?: string;
+  articles: number[];
 };

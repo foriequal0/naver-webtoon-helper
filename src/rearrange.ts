@@ -39,14 +39,17 @@ async function group(tier: Tier, thumbs: Thumbnail[]): Promise<SortResult> {
 
   for (const thumb of thumbs) {
     const state = states[thumb.titleId];
-    const lastRead = state.estimateLastRead();
     const readIn = (weeks: number): boolean => {
-      if (!lastRead) {
+      if (state.length == 0) {
         return false;
       }
+      if (!state.readAt) {
+        return false;
+      }
+
       const DAYS_OFFSET = 1;
       const ms = (weeks * 7 + DAYS_OFFSET) * 24 * 60 * 60 * 1000;
-      return now - lastRead.getTime() < ms;
+      return now - state.readAt.getTime() < ms;
     };
 
     // TODO : 휴재하면 내리고 재개하면 위로 올리기

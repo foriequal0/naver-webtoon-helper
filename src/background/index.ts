@@ -9,12 +9,6 @@ export type SetReadArgs = {
   no: number;
 };
 
-export type SyncArgs = {
-  tier: Tier;
-  titleId: number;
-  no: number;
-};
-
 export type SetMuteArgs = {
   tier: Tier;
   titleId: number;

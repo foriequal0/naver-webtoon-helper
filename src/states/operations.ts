@@ -2,7 +2,7 @@ import AsyncLock from "async-lock";
 import { browser } from "webextension-polyfill-ts";
 
 import { Tier } from "../Tier";
-import { TitleState } from "./";
+import { MetaState, TitleState } from "./";
 import { TitleJSON } from "./models";
 
 function getTitleStateKey(tier: Tier, titleId: number): string {
@@ -11,37 +11,32 @@ function getTitleStateKey(tier: Tier, titleId: number): string {
 
 export async function getTitleState(tier: Tier, titleId: number): Promise<TitleState> {
   const stateKey = getTitleStateKey(tier, titleId);
-  try {
-    const result = await browser.storage.local.get(stateKey);
-    return TitleState.fromJSON({
-      tier,
-      ...result[stateKey],
-    });
-  } catch (e) {
-    return new TitleState(tier, titleId, false, {});
-  }
+  const result = await browser.storage.sync.get(stateKey);
+  return TitleState.fromJSON({
+    tier,
+    ...result[stateKey],
+  });
 }
 
 export async function getTitleStates(tier: Tier, ...titleIds: number[]): Promise<TitleState[]> {
   const query: Record<string, TitleJSON> = {};
   for (const titleId of titleIds) {
     const key = getTitleStateKey(tier, titleId);
-    const defaultValue = {
+    const defaultValue: TitleJSON = {
       tier,
       titleId,
-      mute: false,
       articles: [],
     };
     query[key] = defaultValue;
   }
-  const result = await browser.storage.local.get(query);
+  const result = await browser.storage.sync.get(query);
   return Object.values(result).map(TitleState.fromJSON);
 }
 
 async function setTitleState(tier: Tier, titleId: number, state: TitleState): Promise<void> {
   const stateKey = getTitleStateKey(tier, titleId);
   const json = state.toJSON();
-  await browser.storage.local.set({ [stateKey]: json });
+  await browser.storage.sync.set({ [stateKey]: json });
 }
 
 export async function updateTitleState<T>(
@@ -59,8 +54,19 @@ export async function updateTitleState<T>(
   });
 }
 
+export async function updateMetaState<T>(lock: AsyncLock, update: (state: MetaState) => T): Promise<T> {
+  return await lock.acquire("$meta", async () => {
+    const json = await browser.storage.sync.get("$meta");
+    const meta = MetaState.fromJSON(json["$meta"]);
+    const result = update(meta);
+    const updatedJson = meta.toJSON();
+    await browser.storage.sync.set({ $meta: updatedJson });
+    return result;
+  });
+}
+
 export async function exportStates(): Promise<string> {
-  const state = await browser.storage.local.get();
+  const state = await browser.storage.sync.get();
   const result: Record<string, unknown>[] = [];
   for (const [key, value] of Object.entries(state)) {
     if (key.startsWith("title:")) {
@@ -80,7 +86,7 @@ export async function importStates(json: string): Promise<number> {
     result[key] = titleState.toJSON();
     count++;
   }
-  await browser.storage.local.clear();
-  await browser.storage.local.set(result);
+  await browser.storage.sync.clear();
+  await browser.storage.sync.set(result);
   return count;
 }

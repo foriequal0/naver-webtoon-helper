@@ -1,131 +1,94 @@
 import { Tier } from "../Tier";
-import { ArticleJSON, TitleJSON } from "./models";
+import { MetaJSON, TitleJSON } from "./models";
+
+export class MetaState {
+  public readonly version: string;
+  public syncAt?: Date;
+
+  private constructor(version: string, syncAt: Date | undefined) {
+    this.version = version;
+    this.syncAt = syncAt;
+  }
+
+  public updateSyncAt(debounce: number): boolean {
+    const syncAt = this.syncAt;
+    const now = new Date();
+
+    const diff = now.getSeconds() - (syncAt?.getSeconds() ?? 0);
+    if (diff < debounce) {
+      return false;
+    }
+
+    this.syncAt = now;
+    return true;
+  }
+
+  public static fromJSON(json: MetaJSON): MetaState {
+    const syncAt = json.syncAt ? new Date(json.syncAt) : undefined;
+    return new MetaState(json.version, syncAt);
+  }
+
+  public toJSON(): MetaJSON {
+    return {
+      version: this.version,
+      syncAt: this.syncAt?.toJSON(),
+    };
+  }
+}
 
 export class TitleState {
   public readonly tier: Tier;
   public readonly titleId: number;
   public mute: boolean;
-  public readonly articles: Record<number, ArticleState>;
+  public readAt?: Date;
+  private readonly articles: Set<number>;
   public get length(): number {
-    return Object.entries(this.articles).length;
+    return this.articles.size;
   }
 
-  public constructor(tier: Tier, titleId: number, mute: boolean, articles: Record<number, ArticleState>) {
+  private constructor(tier: Tier, titleId: number, mute: boolean, readAt: Date | undefined, articles: Set<number>) {
     this.tier = tier;
     this.titleId = titleId;
     this.mute = mute;
+    this.readAt = readAt;
     this.articles = articles;
-  }
-
-  public estimateLastRead(): Date | undefined {
-    const articles = Object.values(this.articles);
-    articles.sort((x, y) => x.no - y.no);
-    for (let i = articles.length - 1; i >= 0; i--) {
-      const article = articles[i];
-      if (article.readAt) {
-        return article.readAt;
-      }
-      if (article.syncAt) {
-        return article.syncAt;
-      }
-    }
-    return;
   }
 
   public lastReadNo(): number | undefined {
     let last: number | undefined;
-    for (const value of Object.values(this.articles)) {
-      if (!last || value.no > last) {
-        last = value.no;
+    for (const value of this.articles) {
+      if (last && last >= value) {
+        continue;
       }
+
+      last = value;
     }
     return last;
   }
 
-  public setRead(no: number): void {
-    if (!this.articles[no]) {
-      this.articles[no] = ArticleState.createRead(no);
-    }
+  public hasRead(no: number): boolean {
+    return this.articles.has(no);
   }
 
-  /**
-   * @returns boolean 방금 싱크됨
-   */
-  public sync(no: number): boolean {
-    const article = this.articles[no];
-    if (article) {
-      return article.setSync();
-    } else {
-      this.articles[no] = ArticleState.createSync(no);
-      return true;
-    }
+  public setRead(no: number): void {
+    this.articles.add(no);
+    this.readAt = new Date();
   }
 
   public static fromJSON(json: TitleJSON): TitleState {
-    const articles: Record<number, ArticleState> = Object.fromEntries(
-      json.articles.map((article) => [article.no, ArticleState.fromJSON(article)])
-    );
-    return new TitleState(json.tier, json.titleId, json.mute, articles);
+    const mute = json.mute ?? false;
+    const readAt = json.readAt ? new Date(json.readAt) : undefined;
+    const articles = new Set(json.articles);
+    return new TitleState(json.tier, json.titleId, mute, readAt, articles);
   }
 
   public toJSON(): TitleJSON {
     return {
       tier: this.tier,
       titleId: this.titleId,
-      mute: this.mute,
-      articles: Object.values(this.articles).map((article) => article.toJSON()),
-    };
-  }
-}
-
-export class ArticleState {
-  public readonly no: number;
-  public readAt?: Date;
-  public syncAt?: Date;
-
-  private constructor(no: number, readAt: Date | undefined, syncAt: Date | undefined) {
-    this.no = no;
-    this.readAt = readAt;
-    this.syncAt = syncAt;
-  }
-
-  public static createRead(no: number): ArticleState {
-    return new ArticleState(no, new Date(), undefined);
-  }
-
-  public static createSync(no: number): ArticleState {
-    return new ArticleState(no, undefined, new Date());
-  }
-
-  /**
-   * @returns boolean 방금 싱크됨
-   */
-  public setSync(): boolean {
-    if (!this.syncAt) {
-      this.syncAt = new Date();
-      return true;
-    }
-    return false;
-  }
-
-  static fromJSON(json: ArticleJSON): ArticleState {
-    let readAt: Date | undefined;
-    if (json.readAt) {
-      readAt = new Date(json.readAt);
-    }
-    let syncAt: Date | undefined;
-    if (json.syncAt) {
-      syncAt = new Date(json.syncAt);
-    }
-
-    return new ArticleState(json.no, readAt, syncAt);
-  }
-
-  toJSON(): ArticleJSON {
-    return {
-      no: this.no,
+      mute: this.mute ? true : undefined,
       readAt: this.readAt?.toJSON(),
-      syncAt: this.syncAt?.toJSON(),
+      articles: [...this.articles].sort(),
     };
   }
 }
