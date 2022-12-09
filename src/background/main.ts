@@ -37,15 +37,15 @@ export type Message<Type extends MessageType> = {
   args: MessageArgs<Type>;
 };
 export type MessageArgs<Type extends MessageType> = Parameters<typeof handlers[Type]>[0];
-export type MessageResponse<Type extends MessageType> = Unpromisify<ReturnType<typeof handlers[Type]>>;
+export type MessageResponse<Type extends MessageType> = Awaited<ReturnType<typeof handlers[Type]>>;
 
-type Unpromisify<T> = T extends Promise<infer R> ? R : T;
-
-async function handleMessage(message: unknown, _sender: MessageSender): Promise<unknown> {
-  const { type, args } = message as Message<MessageType>;
-  const handler = handlers[type];
-  // @ts-ignore TS2345
-  return await handler(args);
+async function handleMessage<T extends MessageType>(
+  message: Message<T>,
+  _sender: MessageSender
+): Promise<MessageResponse<T>> {
+  // @ts-ignore TS 가 타입 매핑을 잘 못함
+  const handler: (arg: MessageArgs<T>) => Promise<MessageResponse<T>> = handlers[message.type];
+  return await handler(message.args);
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
