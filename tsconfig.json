@@ -1,8 +1,8 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2021"],
     "sourceMap": true,
     // You have to explicitly set @types to get DefinitelyTyped type definitions
     "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"]
