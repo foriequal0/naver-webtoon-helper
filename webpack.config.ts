@@ -1,6 +1,6 @@
 import * as path from "path";
 
-import CopyPlugin from "copy-webpack-plugin";
+import CopyPlugin = require("copy-webpack-plugin");
 import webpack from "webpack";
 
 export default <webpack.Configuration>{
