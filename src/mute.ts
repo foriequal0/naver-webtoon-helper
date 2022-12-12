@@ -1,5 +1,5 @@
 import { request } from "./background";
-import { TitleState } from "./TitleState";
+import { TitleState } from "./states";
 
 export function addMute(state: TitleState): void {
   const group = document.querySelector(".btn_group")!;

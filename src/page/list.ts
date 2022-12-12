@@ -1,10 +1,11 @@
-import { getDay } from "date-fns";
 import utcToZonedTime from "date-fns-tz/utcToZonedTime";
 import addHours from "date-fns/addHours";
+import getDay from "date-fns/getDay";
 
 import { addMute } from "../mute";
+import { TitleState } from "../states";
+import { getTitleState } from "../states/operations";
 import { syncRecentViews } from "../syncRecentViews";
-import { getTitleState, TitleState } from "../TitleState";
 import { Detail, parseDetail, parseList } from "../url";
 
 main().catch((e) => {
@@ -66,14 +67,14 @@ function fadeRead(state: TitleState) {
   for (const title of document.querySelectorAll<HTMLTableCellElement>("td.title")) {
     const row = title.closest("tr")!;
     const detail = parseDetail(row.querySelector("a")!.href);
-    if (state.articles[detail.no]) {
+    if (state.hasRead(detail.no)) {
       row.style.opacity = "0.5";
     }
   }
 }
 
 function autoJumpMostRecent(state: TitleState, mostRecent: DetailRow) {
-  if (state.articles[mostRecent.no - 1] && !state.articles[mostRecent.no]) {
+  if (state.hasRead(mostRecent.no - 1) && !state.hasRead(mostRecent.no)) {
     window.location.href = mostRecent.url.href;
     return true;
   }
@@ -88,7 +89,7 @@ function refreshUntilUpdate(state: TitleState, weekday: string, mostRecent: Deta
   const day = getDay(oneHourAfter);
   const theDay = day === weekdays[weekday];
 
-  if (theDay && !mostRecent.up && state.articles[mostRecent.no]) {
+  if (theDay && !mostRecent.up && state.hasRead(mostRecent.no)) {
     // 1분 간격 새로고침
     setTimeout(() => {
       window.location.reload();

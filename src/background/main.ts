@@ -1,25 +1,19 @@
 import AsyncLock from "async-lock";
 import { browser, Runtime } from "webextension-polyfill-ts";
 
-import { updateTitleState } from "../TitleState";
-import { InmemoryState } from "./inmemoryState";
-
-import { PrepareSync, SetMuteArgs, SetReadArgs, SyncArgs } from "./index";
+import { migrate } from "../migrations";
+import { updateMetaState, updateTitleState } from "../states/operations";
+import { PrepareSync, SetMuteArgs, SetReadArgs } from "./";
 
 import MessageSender = Runtime.MessageSender;
+import OnInstalledDetailsType = Runtime.OnInstalledDetailsType;
 
 const lock = new AsyncLock();
-const inMemoryState = new InmemoryState();
 
 const handlers = {
   "set-read": async (args: SetReadArgs) => {
     return await updateTitleState(lock, args.tier, args.titleId, (state) => {
       return state.setRead(args.no);
-    });
-  },
-  sync: async (args: SyncArgs) => {
-    return await updateTitleState(lock, args.tier, args.titleId, (state) => {
-      return state.sync(args.no);
     });
   },
   "set-mute": async (args: SetMuteArgs) => {
@@ -28,7 +22,9 @@ const handlers = {
     });
   },
   "debounce-sync": (args: PrepareSync) => {
-    return inMemoryState.debounceSync(args.debounce);
+    return updateMetaState(lock, (state) => {
+      return state.updateSyncAt(args.debounce);
+    });
   },
 };
 
@@ -38,15 +34,25 @@ export type Message<Type extends MessageType> = {
   args: MessageArgs<Type>;
 };
 export type MessageArgs<Type extends MessageType> = Parameters<typeof handlers[Type]>[0];
-export type MessageResponse<Type extends MessageType> = Unpromisify<ReturnType<typeof handlers[Type]>>;
+export type MessageResponse<Type extends MessageType> = Awaited<ReturnType<typeof handlers[Type]>>;
 
-type Unpromisify<T> = T extends Promise<infer R> ? R : T;
-
-async function handleMessage(message: unknown, _sender: MessageSender): Promise<unknown> {
-  const { type, args } = message as Message<MessageType>;
-  const handler = handlers[type];
-  // @ts-ignore TS2345
-  return await handler(args);
+async function handleMessage<T extends MessageType>(
+  message: Message<T>,
+  _sender: MessageSender
+): Promise<MessageResponse<T>> {
+  // @ts-ignore TS 가 타입 매핑을 잘 못함
+  const handler: (arg: MessageArgs<T>) => Promise<MessageResponse<T>> = handlers[message.type];
+  return await handler(message.args);
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
+
+async function handleInstall(detail: OnInstalledDetailsType): Promise<void> {
+  if (detail.reason !== "update" || !detail.previousVersion) {
+    return;
+  }
+
+  await migrate(detail.previousVersion);
+}
+
+browser.runtime.onInstalled.addListener(handleInstall);
