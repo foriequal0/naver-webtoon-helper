@@ -14,6 +14,7 @@ export async function getTitleState(tier: Tier, titleId: number): Promise<TitleS
   const result = await browser.storage.sync.get(stateKey);
   return TitleState.fromJSON({
     tier,
+    titleId,
     ...result[stateKey],
   });
 }

@@ -71,8 +71,10 @@ export class TitleState {
   }
 
   public setRead(no: number): void {
-    this.articles.add(no);
-    this.readAt = new Date();
+    if (this.articles.has(no)) {
+      this.articles.add(no);
+      this.readAt = new Date();
+    }
   }
 
   public static fromJSON(json: TitleJSON): TitleState {
