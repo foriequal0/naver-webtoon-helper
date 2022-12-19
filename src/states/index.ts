@@ -70,11 +70,13 @@ export class TitleState {
     return this.articles.has(no);
   }
 
-  public setRead(no: number): void {
+  public setRead(no: number): boolean {
     if (this.articles.has(no)) {
       this.articles.add(no);
       this.readAt = new Date();
+      return true;
     }
+    return false;
   }
 
   public static fromJSON(json: TitleJSON): TitleState {

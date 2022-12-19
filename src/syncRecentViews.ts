@@ -2,22 +2,37 @@ import { request } from "./background";
 
 export async function syncRecentViews(): Promise<void> {
   const debounced = await request("debounce-sync", {
-    debounce: 300,
+    debounce: 600,
   });
 
   if (debounced) {
     return;
   }
 
-  for await (const rv of fetchRecentViews()) {
-    const tier = getTier(rv.webtoonLevelCode);
-    await request("set-read", {
-      tier,
-      titleId: rv.titleId,
-      no: rv.no,
-    });
+  for (let pageNumber = 1; ; pageNumber++) {
+    const page = await fetchRecentViews(pageNumber);
+    let allSync = true;
+    for (const rv of page.recentlyViewList) {
+      const tier = getTier(rv.webtoonLevelCode);
+      const set = await request("set-read", {
+        tier,
+        titleId: rv.titleId,
+        no: rv.no,
+      });
+      if (!set) {
+        allSync = false;
+      }
+    }
+    if (allSync) {
+      break;
+    }
   }
 }
+
+type Page = {
+  more: boolean;
+  recentlyViewList: RecentView[];
+};
 
 export type RecentView = {
   webtoonLevelCode: "WEBTOON" | "BEST_CHALLENGE" | "CHALLENGE";
@@ -28,28 +43,10 @@ export type RecentView = {
   // 나머지 필드 생략
 };
 
-async function* fetchRecentViews(): AsyncGenerator<RecentView> {
-  function getURL(page: number): string {
-    return `https://m.comic.naver.com/api/recentlyview/get.nhn?page=${page}`;
-  }
-
-  type Page = {
-    more: boolean;
-    page: number;
-    recentlyViewList: RecentView[];
-  };
-
-  for (let page = 1; ; page++) {
-    const url = getURL(page);
-    const res: Page = await fetch(url).then((x) => x.json());
-    for (const recentView of res.recentlyViewList) {
-      yield recentView;
-    }
-
-    if (!res.more) {
-      break;
-    }
-  }
+async function fetchRecentViews(page: number): Promise<Page> {
+  const url = `https://m.comic.naver.com/api/recentlyview/get.nhn?page=${page}`;
+  const res = await fetch(url);
+  return res.json();
 }
 
 function getTier(code: RecentView["webtoonLevelCode"]) {
