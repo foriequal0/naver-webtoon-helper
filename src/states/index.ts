@@ -10,17 +10,17 @@ export class MetaState {
     this.syncAt = syncAt;
   }
 
-  public updateSyncAt(debounce: number): boolean {
+  public debounceSyncAt(debounce: number): boolean {
     const syncAt = this.syncAt;
     const now = new Date();
 
     const diff = now.getSeconds() - (syncAt?.getSeconds() ?? 0);
     if (diff < debounce) {
-      return false;
+      return true;
     }
 
     this.syncAt = now;
-    return true;
+    return false;
   }
 
   public static fromJSON(json: MetaJSON): MetaState {

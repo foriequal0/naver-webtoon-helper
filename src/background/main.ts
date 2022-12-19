@@ -23,7 +23,7 @@ const handlers = {
   },
   "debounce-sync": (args: PrepareSync) => {
     return updateMetaState(lock, (state) => {
-      return state.updateSyncAt(args.debounce);
+      return state.debounceSyncAt(args.debounce);
     });
   },
 };
