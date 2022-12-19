@@ -10,17 +10,17 @@ export class MetaState {
     this.syncAt = syncAt;
   }
 
-  public updateSyncAt(debounce: number): boolean {
+  public debounceSyncAt(debounce: number): boolean {
     const syncAt = this.syncAt;
     const now = new Date();
 
     const diff = now.getSeconds() - (syncAt?.getSeconds() ?? 0);
     if (diff < debounce) {
-      return false;
+      return true;
     }
 
     this.syncAt = now;
-    return true;
+    return false;
   }
 
   public static fromJSON(json: MetaJSON): MetaState {
@@ -70,11 +70,13 @@ export class TitleState {
     return this.articles.has(no);
   }
 
-  public setRead(no: number): void {
+  public setRead(no: number): boolean {
     if (this.articles.has(no)) {
       this.articles.add(no);
       this.readAt = new Date();
+      return true;
     }
+    return false;
   }
 
   public static fromJSON(json: TitleJSON): TitleState {
