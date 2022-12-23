@@ -71,7 +71,7 @@ export class TitleState {
   }
 
   public setRead(no: number): boolean {
-    if (this.articles.has(no)) {
+    if (!this.articles.has(no)) {
       this.articles.add(no);
       this.readAt = new Date();
       return true;
