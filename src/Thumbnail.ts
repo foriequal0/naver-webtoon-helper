@@ -11,8 +11,22 @@ export function parseThumbnail(thumb: HTMLElement): Thumbnail {
   const href = thumb.querySelector("a")!.href;
   const list = parseList(href);
 
-  const fresh = thumb.querySelector("span.ico_new2") !== null;
-  const up = thumb.querySelector("em.ico_updt") !== null;
+  const fresh = (() => {
+    for (const bullet of thumb.querySelectorAll('i[class^="Poster__icon_bullet"]')) {
+      if (bullet.textContent == "신작") {
+        return true;
+      }
+    }
+    return false;
+  })();
+  const up = (() => {
+    for (const bullet of thumb.querySelectorAll('i[class^="ContentTitle__icon_bullet"]')) {
+      if (bullet.textContent == "UP") {
+        return true;
+      }
+    }
+    return false;
+  })();
   return {
     titleId: list.titleId,
     fresh,

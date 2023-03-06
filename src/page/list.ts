@@ -1,76 +1,42 @@
-import utcToZonedTime from "date-fns-tz/utcToZonedTime";
-import addHours from "date-fns/addHours";
-import getDay from "date-fns/getDay";
-
+import { request } from "../background";
 import { addMute } from "../mute";
+import { querySelectorAll } from "../selectors";
 import { TitleState } from "../states";
 import { getTitleState } from "../states/operations";
-import { syncRecentViews } from "../syncRecentViews";
 import { Detail, parseDetail, parseList } from "../url";
 
-main().catch((e) => {
-  throw e;
-});
-
-async function main() {
-  await syncRecentViews();
+export async function list() {
   const list = parseList(window.location.href);
-  const rows = getRows();
+  const rows = await getRows();
+  await request("sync-bulk", {
+    tier: list.tier,
+    titleId: list.titleId,
+    states: rows.map(({ no, read }) => ({ no, read })),
+  });
+
+  // addMute(state);
+
   const mostRecent = rows[0];
   const state = await getTitleState(list.tier, list.titleId);
-  addMute(state);
-
-  updateThumbnailLink(state, mostRecent);
-  fadeRead(state);
   if (!state.mute) {
     if (autoJumpMostRecent(state, mostRecent)) {
       return;
     }
-    if (list.weekday) {
-      refreshUntilUpdate(state, list.weekday, mostRecent);
-    }
   }
 }
 
-type DetailRow = Detail & { up: boolean };
+type DetailRow = Detail & { up: boolean; read: boolean };
 
-function getRows(): DetailRow[] {
+async function getRows(): Promise<DetailRow[]> {
   const result: DetailRow[] = [];
-  for (const title of document.querySelectorAll<HTMLTableCellElement>("td.title")) {
-    const element = title.closest("tr")!;
-    const detail = parseDetail(element.querySelector("a")!.href);
-    const up = element.querySelector("img[alt='UP']") !== null;
-    result.push({ ...detail, up });
+  for (const item of await querySelectorAll('li[class^="EpisodeListList__item"]')) {
+    const a = item.querySelector("a")!;
+    const detail = parseDetail(a.href);
+    const up = item.querySelector('i[class^="EpisodeListList__icon_bullet"]')?.textContent == "up";
+    const read = [...a.classList].some((c) => c.startsWith("EpisodeListList__visited"));
+    result.push({ ...detail, up, read });
   }
   return result;
-}
-
-function updateThumbnailLink(state: TitleState, mostRecent: DetailRow) {
-  const thumb = document.querySelector<HTMLAnchorElement>(".thumb > a")!;
-  const lastSeen = state.lastReadNo();
-  const url = new URL(mostRecent.url.href);
-  if (!lastSeen) {
-    // 본 적 없으면 첫회보기;
-    url.searchParams.set("no", "1");
-  } else if (lastSeen !== mostRecent.no) {
-    // 마지막으로 본 화 다음화로 바로가기
-    url.searchParams.set("no", (lastSeen + 1).toString());
-  } else if (lastSeen === mostRecent.no) {
-    // 최신회차까지 다 봤으면 썸네일 흐리게
-    url.searchParams.set("no", mostRecent.no.toString());
-    thumb.style.opacity = "0.5";
-  }
-  thumb.href = url.href;
-}
-
-function fadeRead(state: TitleState) {
-  for (const title of document.querySelectorAll<HTMLTableCellElement>("td.title")) {
-    const row = title.closest("tr")!;
-    const detail = parseDetail(row.querySelector("a")!.href);
-    if (state.hasRead(detail.no)) {
-      row.style.opacity = "0.5";
-    }
-  }
 }
 
 function autoJumpMostRecent(state: TitleState, mostRecent: DetailRow) {
@@ -79,20 +45,4 @@ function autoJumpMostRecent(state: TitleState, mostRecent: DetailRow) {
     return true;
   }
   return false;
-}
-
-function refreshUntilUpdate(state: TitleState, weekday: string, mostRecent: DetailRow) {
-  const weekdays: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-  // 네이버 웹툰은 1시간 일찍 공개된다
-  const seoul = utcToZonedTime(new Date(), "Asia/Seoul");
-  const oneHourAfter = addHours(seoul, 1);
-  const day = getDay(oneHourAfter);
-  const theDay = day === weekdays[weekday];
-
-  if (theDay && !mostRecent.up && state.hasRead(mostRecent.no)) {
-    // 1분 간격 새로고침
-    setTimeout(() => {
-      window.location.reload();
-    }, 60 * 1000);
-  }
 }

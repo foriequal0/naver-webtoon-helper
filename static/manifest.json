@@ -12,27 +12,11 @@
   "content_scripts": [
     {
       "matches": [
-        "https://comic.naver.com/webtoon/detail?*",
-        "https://comic.naver.com/bestChallenge/detail?*",
-        "https://comic.naver.com/challenge/detail?*"
+        "https://comic.naver.com/webtoon*",
+        "https://comic.naver.com/bestChallenge*",
+        "https://comic.naver.com/challenge*"
       ],
-      "js": ["detail.js"]
-    },
-    {
-      "matches": [
-        "https://comic.naver.com/webtoon/list?*",
-        "https://comic.naver.com/bestChallenge/list?*",
-        "https://comic.naver.com/challenge/list?*"
-      ],
-      "js": ["list.js"]
-    },
-    {
-      "matches": ["https://comic.naver.com/webtoon/weekday", "https://comic.naver.com/webtoon/weekday?*"],
-      "js": ["weekday.js"]
-    },
-    {
-      "matches": ["https://comic.naver.com/webtoon/weekdayList?*"],
-      "js": ["weekdayList.js"]
+      "js": ["main.js"]
     },
     {
       "matches": ["https://m.comic.naver.com/*"],

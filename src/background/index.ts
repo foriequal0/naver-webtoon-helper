@@ -9,6 +9,12 @@ export type SetReadArgs = {
   no: number;
 };
 
+export type SyncBulkArgs = {
+  tier: Tier;
+  titleId: number;
+  states: { no: number; read: boolean }[];
+};
+
 export type SetMuteArgs = {
   tier: Tier;
   titleId: number;

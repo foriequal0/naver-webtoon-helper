@@ -1,9 +1,9 @@
 import AsyncLock from "async-lock";
 import { browser } from "webextension-polyfill-ts";
 
-import { Tier } from "../Tier";
 import { MetaState, TitleState } from "./";
-import { TitleJSON } from "./models";
+import { MetaJSON, TitleJSON } from "./models";
+import { Tier } from "../Tier";
 
 function getTitleStateKey(tier: Tier, titleId: number): string {
   return `title:${tier}:${titleId}`;
@@ -57,7 +57,7 @@ export async function updateTitleState<T>(
 
 export async function updateMetaState<T>(lock: AsyncLock, update: (state: MetaState) => T): Promise<T> {
   return await lock.acquire("$meta", async () => {
-    const json = await browser.storage.sync.get("$meta");
+    const json = await browser.storage.sync.get({ $meta: {} });
     const meta = MetaState.fromJSON(json["$meta"]);
     const result = update(meta);
     const updatedJson = meta.toJSON();

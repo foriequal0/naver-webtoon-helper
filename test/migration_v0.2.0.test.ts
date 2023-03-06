@@ -1,7 +1,7 @@
 import { describe, it, vi, afterEach, expect } from "vitest";
 
-import * as v2 from "../src/migrations/v0.2.0";
 import { FakeStorage } from "./fakeStorage";
+import * as v2 from "../src/migrations/v0.2.0";
 
 vi.stubGlobal("browser", {
   storage: {

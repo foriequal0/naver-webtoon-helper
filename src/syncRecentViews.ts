@@ -2,22 +2,27 @@ import { request } from "./background";
 
 export async function syncRecentViews(): Promise<void> {
   const debounced = await request("debounce-sync", {
-    debounce: 600,
+    debounce: 1,
   });
 
   if (debounced) {
     return;
   }
 
-  for (let pageNumber = 1; ; pageNumber++) {
+  let pageNumber = 1;
+  while (pageNumber != 0) {
     const page = await fetchRecentViews(pageNumber);
+    if (page == null) {
+      return;
+    }
+
     let allSync = true;
-    for (const rv of page.recentlyViewList) {
-      const tier = getTier(rv.webtoonLevelCode);
+    for (const item of page.itemList) {
+      const tier = getTier(item.webtoonLevelCode);
       const set = await request("set-read", {
         tier,
-        titleId: rv.titleId,
-        no: rv.no,
+        titleId: item.titleId,
+        no: item.no,
       });
       if (!set) {
         allSync = false;
@@ -26,15 +31,22 @@ export async function syncRecentViews(): Promise<void> {
     if (allSync) {
       break;
     }
+
+    pageNumber = page.pageInfo.nextPage;
   }
 }
 
 type Page = {
-  more: boolean;
-  recentlyViewList: RecentView[];
+  pageInfo: PageInfo;
+  itemList: Item[];
 };
 
-export type RecentView = {
+type PageInfo = {
+  nextPage: number;
+  // 나머지 필드 생략
+};
+
+export type Item = {
   webtoonLevelCode: "WEBTOON" | "BEST_CHALLENGE" | "CHALLENGE";
   // 작품 ID
   titleId: number;
@@ -43,13 +55,16 @@ export type RecentView = {
   // 나머지 필드 생략
 };
 
-async function fetchRecentViews(page: number): Promise<Page> {
-  const url = `https://m.comic.naver.com/api/recentlyview/get.nhn?page=${page}`;
+async function fetchRecentViews(page: number): Promise<Page | null> {
+  const url = `https://comic.naver.com/api/recently/list?page=${page}&order=LAST_ARTICLE_SERVICE_DATE`;
   const res = await fetch(url);
+  if (res.status == 401) {
+    return null;
+  }
   return res.json();
 }
 
-function getTier(code: RecentView["webtoonLevelCode"]) {
+function getTier(code: Item["webtoonLevelCode"]) {
   switch (code) {
     case "WEBTOON":
       return "webtoon";

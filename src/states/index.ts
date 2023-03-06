@@ -79,6 +79,14 @@ export class TitleState {
     return false;
   }
 
+  public setReadState(no: number, read: boolean) {
+    if (read) {
+      this.articles.add(no);
+    } else {
+      this.articles.delete(no);
+    }
+  }
+
   public static fromJSON(json: TitleJSON): TitleState {
     const mute = json.mute ?? false;
     const readAt = json.readAt ? new Date(json.readAt) : undefined;

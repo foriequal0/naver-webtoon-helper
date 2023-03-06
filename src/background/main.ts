@@ -1,9 +1,9 @@
 import AsyncLock from "async-lock";
 import { browser, Runtime } from "webextension-polyfill-ts";
 
+import { PrepareSync, SetMuteArgs, SetReadArgs, SyncBulkArgs } from "./";
 import { migrate } from "../migrations";
 import { updateMetaState, updateTitleState } from "../states/operations";
-import { PrepareSync, SetMuteArgs, SetReadArgs } from "./";
 
 import MessageSender = Runtime.MessageSender;
 import OnInstalledDetailsType = Runtime.OnInstalledDetailsType;
@@ -14,6 +14,13 @@ const handlers = {
   "set-read": async (args: SetReadArgs) => {
     return await updateTitleState(lock, args.tier, args.titleId, (state) => {
       return state.setRead(args.no);
+    });
+  },
+  "sync-bulk": async (args: SyncBulkArgs) => {
+    return await updateTitleState(lock, args.tier, args.titleId, (state) => {
+      for (const { no, read } of args.states) {
+        state.setReadState(no, read);
+      }
     });
   },
   "set-mute": async (args: SetMuteArgs) => {
