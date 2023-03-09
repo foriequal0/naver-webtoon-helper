@@ -4,7 +4,7 @@ set -euo pipefail
 
 readonly NPM_BIN=$(npm bin)
 
-"$NPM_BIN/webpack" --watch &
+"$NPM_BIN/webpack" --mode=development --watch &
 readonly WEBPACK=$!
 kill-webpack() {
   kill "$WEBPACK"

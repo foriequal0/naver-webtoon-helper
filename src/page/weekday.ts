@@ -1,15 +1,8 @@
 import { rearrange } from "../rearrange";
-import { syncRecentViews } from "../syncRecentViews";
+import { querySelectorAll } from "../selectors";
 
-main().catch((e) => {
-  throw e;
-});
-
-async function main() {
-  await syncRecentViews();
-
-  for (const column of document.querySelectorAll("div.col")) {
-    const container = column.querySelector<HTMLElement>("ul")!;
-    await rearrange("webtoon", container);
+export async function weekday() {
+  for (const list of await querySelectorAll('ul[class^="WeekdayMainView__daily_list"]')) {
+    await rearrange("webtoon", list);
   }
 }

@@ -1,12 +1,18 @@
 import { browser } from "webextension-polyfill-ts";
 
-import { Tier } from "../Tier";
 import { MessageArgs, MessageResponse, MessageType } from "./main";
+import { Tier } from "../Tier";
 
 export type SetReadArgs = {
   tier: Tier;
   titleId: number;
   no: number;
+};
+
+export type SyncBulkArgs = {
+  tier: Tier;
+  titleId: number;
+  states: { no: number; read: boolean }[];
 };
 
 export type SetMuteArgs = {

@@ -22,7 +22,6 @@ export type List = {
   url: URL;
   tier: Tier;
   titleId: number;
-  weekday?: string;
 };
 
 export function parseList(href: string): List {
@@ -30,7 +29,6 @@ export function parseList(href: string): List {
   const tier = getTier(url);
   const titleIdStr = url.searchParams.get("titleId")!;
   const titleId = parseInt(titleIdStr);
-  const weekday = url.searchParams.get("weekday") ?? undefined;
 
-  return { url, tier, titleId, weekday };
+  return { url, tier, titleId };
 }

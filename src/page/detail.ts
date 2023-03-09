@@ -1,16 +1,10 @@
 import { request } from "../background";
-import { addMute } from "../mute";
+import { querySelector } from "../selectors";
 import { getTitleState } from "../states/operations";
-import { syncRecentViews } from "../syncRecentViews";
 import { Tier } from "../Tier";
 import { parseDetail } from "../url";
 
-main().catch((e) => {
-  throw e;
-});
-
-async function main() {
-  await syncRecentViews();
+export async function detail() {
   const detail = parseDetail(window.location.href);
   await request("set-read", {
     tier: detail.tier,
@@ -18,15 +12,15 @@ async function main() {
     no: detail.no,
   });
   await fadeArticleNavigation(detail.tier, detail.titleId);
-  const state = await getTitleState(detail.tier, detail.titleId);
-  addMute(state);
+  // const state = await getTitleState(detail.tier, detail.titleId);
+  // addMute(state);
 }
 
 async function fadeArticleNavigation(tier: Tier, titleId: number) {
-  const navBody = document.querySelector("#comic_body")!;
+  const episodeList = await querySelector('[class^="ViewerView__episode_list_wrap"]')!;
   async function core() {
     const state = await getTitleState(tier, titleId);
-    for (const item of navBody.querySelectorAll<HTMLDivElement>("div.item")) {
+    for (const item of episodeList.querySelectorAll<HTMLDivElement>('div[class^="ViewerEpisode__item"]')) {
       const a = item.querySelector("a");
       if (!a) {
         continue;
@@ -39,7 +33,7 @@ async function fadeArticleNavigation(tier: Tier, titleId: number) {
   }
 
   await core();
-  new MutationObserver(core).observe(navBody, {
+  new MutationObserver(core).observe(episodeList, {
     subtree: true,
     childList: true,
   });

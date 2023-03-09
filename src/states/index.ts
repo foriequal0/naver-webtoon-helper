@@ -1,5 +1,5 @@
-import { Tier } from "../Tier";
 import { MetaJSON, TitleJSON } from "./models";
+import { Tier } from "../Tier";
 
 export class MetaState {
   public readonly version: string;
@@ -77,6 +77,14 @@ export class TitleState {
       return true;
     }
     return false;
+  }
+
+  public setReadState(no: number, read: boolean) {
+    if (read) {
+      this.articles.add(no);
+    } else {
+      this.articles.delete(no);
+    }
   }
 
   public static fromJSON(json: TitleJSON): TitleState {
