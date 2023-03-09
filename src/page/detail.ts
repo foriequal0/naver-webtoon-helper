@@ -1,5 +1,4 @@
 import { request } from "../background";
-import { addMute } from "../mute";
 import { querySelector } from "../selectors";
 import { getTitleState } from "../states/operations";
 import { Tier } from "../Tier";

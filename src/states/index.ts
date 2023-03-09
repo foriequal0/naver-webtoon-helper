@@ -1,5 +1,5 @@
-import { Tier } from "../Tier";
 import { MetaJSON, TitleJSON } from "./models";
+import { Tier } from "../Tier";
 
 export class MetaState {
   public readonly version: string;

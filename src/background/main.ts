@@ -40,8 +40,8 @@ export type Message<Type extends MessageType> = {
   type: Type;
   args: MessageArgs<Type>;
 };
-export type MessageArgs<Type extends MessageType> = Parameters<typeof handlers[Type]>[0];
-export type MessageResponse<Type extends MessageType> = Awaited<ReturnType<typeof handlers[Type]>>;
+export type MessageArgs<Type extends MessageType> = Parameters<(typeof handlers)[Type]>[0];
+export type MessageResponse<Type extends MessageType> = Awaited<ReturnType<(typeof handlers)[Type]>>;
 
 async function handleMessage<T extends MessageType>(
   message: Message<T>,

@@ -2,7 +2,7 @@ import AsyncLock from "async-lock";
 import { browser } from "webextension-polyfill-ts";
 
 import { MetaState, TitleState } from "./";
-import { MetaJSON, TitleJSON } from "./models";
+import { TitleJSON } from "./models";
 import { Tier } from "../Tier";
 
 function getTitleStateKey(tier: Tier, titleId: number): string {

@@ -1,5 +1,4 @@
 import { request } from "../background";
-import { addMute } from "../mute";
 import { querySelectorAll } from "../selectors";
 import { TitleState } from "../states";
 import { getTitleState } from "../states/operations";
