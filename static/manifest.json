@@ -11,11 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://comic.naver.com/webtoon*",
-        "https://comic.naver.com/bestChallenge*",
-        "https://comic.naver.com/challenge*"
-      ],
+      "matches": ["https://comic.naver.com", "https://comic.naver.com/*"],
       "js": ["main.js"]
     },
     {
