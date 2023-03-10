@@ -13,7 +13,7 @@ const lock = new AsyncLock();
 const handlers = {
   "set-read": async (args: SetReadArgs) => {
     return await updateTitleState(lock, args.tier, args.titleId, (state) => {
-      return state.setRead(args.no);
+      state.setRead(args.no);
     });
   },
   "sync-bulk": async (args: SyncBulkArgs) => {
@@ -28,9 +28,14 @@ const handlers = {
       state.mute = args.mute;
     });
   },
-  "debounce-sync": (args: PrepareSync) => {
+  "prepare-sync": (args: PrepareSync) => {
     return updateMetaState(lock, (state) => {
-      return state.debounceSyncAt(args.debounce);
+      return state.prepareSync(args.debounce);
+    });
+  },
+  "done-sync": (_: unknown) => {
+    return updateMetaState(lock, (state) => {
+      state.doneSync();
     });
   },
 };

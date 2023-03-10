@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "naver-webtoon-helper",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "네이버 웹툰 감상을 도와줍니다.",
   "icons": {
     "48": "icon.svg"
@@ -11,11 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://comic.naver.com/webtoon*",
-        "https://comic.naver.com/bestChallenge*",
-        "https://comic.naver.com/challenge*"
-      ],
+      "matches": ["https://comic.naver.com/*"],
       "js": ["main.js"]
     },
     {
@@ -26,7 +22,7 @@
   "options_ui": {
     "page": "options.html"
   },
-  "permissions": ["https://m.comic.naver.com/api/recentlyview/get.nhn", "webRequest", "cookies", "storage"],
+  "permissions": ["https://comic.naver.com/api/recently/list", "webRequest", "cookies", "storage"],
   "browser_specific_settings": {
     "gecko": {
       "id": "{8f4e36bf-0d47-4fdf-ab3e-3de2c40a95c8}"

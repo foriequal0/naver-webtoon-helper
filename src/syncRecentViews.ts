@@ -1,11 +1,13 @@
 import { request } from "./background";
 
+const SyncTolerance = 300;
+
 export async function syncRecentViews(): Promise<void> {
-  const debounced = await request("debounce-sync", {
-    debounce: 1,
+  const lastSync = await request("prepare-sync", {
+    debounce: 600,
   });
 
-  if (debounced) {
+  if (!lastSync) {
     return;
   }
 
@@ -16,24 +18,31 @@ export async function syncRecentViews(): Promise<void> {
       return;
     }
 
-    let allSync = true;
+    let continuePage = true;
     for (const item of page.itemList) {
       const tier = getTier(item.webtoonLevelCode);
-      const set = await request("set-read", {
+      const [year, month, day, hour, min, sec] = item.readDate;
+      const readDate = new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}+09:00`);
+      if (readDate.getSeconds() + SyncTolerance < lastSync.getSeconds()) {
+        continuePage = false;
+        break;
+      }
+
+      await request("set-read", {
         tier,
         titleId: item.titleId,
         no: item.no,
       });
-      if (!set) {
-        allSync = false;
-      }
     }
-    if (allSync) {
+
+    if (!continuePage) {
       break;
     }
 
     pageNumber = page.pageInfo.nextPage;
   }
+
+  await request("done-sync", {});
 }
 
 type Page = {
@@ -52,6 +61,8 @@ export type Item = {
   titleId: number;
   // 최신 회차 번호
   no: number;
+  // 읽은 시간
+  readDate: [year: number, month: number, day: number, hour: number, min: number, sec: number, ns: number];
   // 나머지 필드 생략
 };
 
