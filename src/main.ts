@@ -24,7 +24,7 @@ async function route(path: string) {
     await detail();
   } else if (path.match(/\/(webtoon|bestChallenge|challenge)\/list\b/)) {
     await list();
-  } else if (path.match(/\/webtoon\/\?/)) {
+  } else if (path.match(/\/webtoon\?/)) {
     await weekdayList();
   } else if (path.match(/\/webtoon\b/)) {
     await weekday();
